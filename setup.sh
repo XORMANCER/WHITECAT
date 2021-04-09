@@ -13,7 +13,7 @@ echo ""
 echo "[~] Installing needed programs.."
 echo ""
 sudo apt-get update
-sudo apt-get install -y hcxdumptool hcxtools hashcat iw grep 
+sudo apt-get install -y wireless-tools net-tools hcxdumptool hcxtools hashcat iw grep gawk
 
 echo ""
 echo "[~] Copying binary files to /usr/bin/"
