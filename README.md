@@ -1,4 +1,4 @@
-| ![image](https://user-images.githubusercontent.com/63486672/114242072-e1852e80-994f-11eb-94b9-b4c4c3ad7f97.png) |
+| ![image](https://user-images.githubusercontent.com/63486672/114242139-05487480-9950-11eb-9fa5-f91d6ab18943.png) |
 | :------: |
 🔮 Crystal utility to automate the capture of an 802.11 PMKID
 
