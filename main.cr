@@ -72,14 +72,16 @@ class Master
     def banner()
         system "clear"
         puts "
-
-  ▄▀▀▄    ▄▀▀▄  ▄▀▀▄ ▄▄   ▄▀▀█▀▄    ▄▀▀▀█▀▀▄  ▄▀▀█▄▄▄▄  ▄▀▄▄▄▄   ▄▀▀█▄   ▄▀▀▀█▀▀▄ 
-  █   █    ▐  █ █  █   ▄▀ █   █  █  █    █  ▐ ▐  ▄▀   ▐ █ █    ▌ ▐ ▄▀ ▀▄ █    █  ▐ 
-  ▐  █        █ ▐  █▄▄▄█  ▐   █  ▐  ▐   █       █▄▄▄▄▄  ▐ █        █▄▄▄█ ▐   █     
-    █   ▄    █     █   █      █        █        █    ▌    █       ▄▀   █    █      
-     ▀▄▀ ▀▄ ▄▀    ▄▀  ▄▀   ▄▀▀▀▀▀▄   ▄▀        ▄▀▄▄▄▄    ▄▀▄▄▄▄▀ █   ▄▀   ▄▀       
-           ▀     █   █    █       █ █          █    ▐   █     ▐  ▐   ▐   █         
-                 ▐   ▐    ▐       ▐ ▐          ▐        ▐                ▐         ", "\n\n"
+         █     █░ ██░ ██  ██▓▄▄▄█████▓▓█████  ▄████▄   ▄▄▄     ▄▄▄█████▓
+        ▓█░ █ ░█░▓██░ ██▒▓██▒▓  ██▒ ▓▒▓█   ▀ ▒██▀ ▀█  ▒████▄   ▓  ██▒ ▓▒
+        ▒█░ █ ░█ ▒██▀▀██░▒██▒▒ ▓██░ ▒░▒███   ▒▓█    ▄ ▒██  ▀█▄ ▒ ▓██░ ▒░
+        ░█░ █ ░█ ░▓█ ░██ ░██░░ ▓██▓ ░ ▒▓█  ▄ ▒▓▓▄ ▄██▒░██▄▄▄▄██░ ▓██▓ ░ 
+        ░░██▒██▓ ░▓█▒░██▓░██░  ▒██▒ ░ ░▒████▒▒ ▓███▀ ░ ▓█   ▓██▒ ▒██▒ ░ 
+        ░ ▓░▒ ▒   ▒ ░░▒░▒░▓    ▒ ░░   ░░ ▒░ ░░ ░▒ ▒  ░ ▒▒   ▓▒█░ ▒ ░░   
+          ▒ ░ ░   ▒ ░▒░ ░ ▒ ░    ░     ░ ░  ░  ░  ▒     ▒   ▒▒ ░   ░    
+          ░   ░   ░  ░░ ░ ▒ ░  ░         ░   ░          ░   ▒    ░      
+            ░     ░  ░  ░ ░              ░  ░░ ░            ░  ░        
+                                             ░", "\n"
         puts "\t\t       - NO NONCE-SENSE PMKID GRABBER -".colorize.light_red
         puts ""
         puts "\t\t\t         -Version 2a-"
@@ -114,10 +116,9 @@ class Master
       # Begin our process
       `sudo airmon-ng check kill >/dev/null`
       `sudo ip link set #{iface} down`
-      `sudo iw dev #{iface} set mode managed`
+      `sudo iw dev #{iface} set mode monitor`
       `sudo ip link set #{iface} up`
-      `sudo hcxdumptool -m #{iface}`
-      #`sudo ip link set #{iface} up`
+      #`sudo hcxdumptool -m #{iface}`
       puts "", `sudo iwconfig #{iface}`
       # Verify monitor mode
       finalMon = `sudo iwconfig #{iface} | grep Mode:Monitor`
