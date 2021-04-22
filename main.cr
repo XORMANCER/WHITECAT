@@ -44,7 +44,7 @@ end
 def createConfig()
   config_banner()
   print "\n[~]".colorize.light_magenta
-  print " Enter BSSID (no colons, ex. AABBCCDDEEFF ) > "
+  print " Enter BSSID > "
   inputBSSID = gets(chomp=true)
   print "\n[~]".colorize.light_magenta
   print " Enter Wifi Interface name > "
@@ -102,6 +102,68 @@ class Master
        `--'   `--'                          
      EOF
     end
+    # Locates our BSSID
+    def findBSSID()
+      #Creates the first capture as a child
+      child_pid = Process.fork() do
+        puts ">> Starting airodump-ng survey".colorize.light_magenta, ""
+        #Grabs wifi interface from json
+        iface = @json_object["wifi_card"].to_s
+        bssid = @json_object["bssid"]
+        #Starts the airodump process
+        puts `sudo airodump-ng -w findBSSID --band abg --bssid #{bssid} --output-format csv #{iface}`
+        Signal::INT.trap() do
+          puts "Signal caught. Exiting cleanly."
+          exit()
+        end
+        loop do end
+      end
+
+      # Doesnt continue until airodump creates the file
+      forever = true
+      while forever == true
+        if File.exists?("findBSSID-01.csv")
+          forever = false
+        end
+      end
+      #This will scan the .csv file for our target bssid
+      scanning = true
+      dotCounter = 0
+      while scanning == true
+        bssid = @json_object["bssid"].to_s
+        sleep 1
+        if dotCounter < 1
+          print "[~] Waiting for BSSID"
+          dotCounter +=1
+        else
+          print "."
+          dotCounter +=1
+        end
+        #If found, send a kill command to our child process
+        if File.read("findBSSID-01.csv").includes?(bssid)
+          puts " // BSSID #{bssid} has been found! ".colorize.light_green, ""
+          print "[~] Processing channel information.. ", ""
+          channel_check = true
+          while channel_check == true
+            channel_num = `grep -m 1 '#{bssid}' findBSSID-01.csv | awk -F , '{print $4}'`.strip
+            if channel_num == "-1"
+              #continue
+            else
+              print "// Channel ".colorize.light_green
+              print channel_num.colorize.light_green
+              puts " found".colorize.light_green, ""
+              channel_check = false
+            end
+          end
+          child_pid.signal(Signal::KILL)
+          scanning = false
+	  `sudo pkill airodump`
+	  sleep 1 
+        end
+      end
+      # Launch FIND CLIENT
+      dump_PMKID(channel_num)
+    end
     # Sets monitor mode
     def monset()
       # Find interface on system
@@ -128,15 +190,16 @@ class Master
       end
   end
     # Locates our BSSID
-    def dump_PMKID()
+    def dump_PMKID(channel_num)
       #Creates the first capture as a child
       child_pid = Process.fork() do
         puts ">> Starting hcxdumptool..".colorize.light_magenta, ""
         #Grabs wifi interface from json
         iface = @json_object["wifi_card"].to_s
-        bssid = @json_object["bssid"].to_s
+        tmp_bssid = @json_object["bssid"].to_s
+	bssid = tmp_bssid.delete(':')
         if bssid.includes?(":")
-          puts "[!!!] Bssid includes colons, please enter bssid without them!"
+          puts "[!!!] Bssid includes colons, .delete method failed!"
           exit()
         end
         # places BSSID into a file
@@ -144,7 +207,7 @@ class Master
         `echo #{bssid.upcase} > bssidFilter`
         #Starts the airodump process
         `touch tmpTracker` 
-        puts `sudo hcxdumptool -i #{iface} -o dump_PMKID.pcapng --enable_status=1 --filterlist_ap=bssidFilter --filtermode=2 --error_max=5 --disable_deauthentication >> tmpTracker`
+        puts `sudo hcxdumptool -i #{iface} -o dump_PMKID.pcapng --enable_status=1 --filterlist_ap=bssidFilter --filtermode=2 --error_max=5 --disable_deauthentication -c #{channel_num} >> tmpTracker`
         Signal::INT.trap() do
           puts ""
           #exit()
@@ -217,6 +280,7 @@ def main()
       `sudo rm -rf dump_PMKID*`
       `sudo rm -rf pmkid.16800*`
       `sudo rm -rf tmpTracker*`
+      `sudo rm -rf findBSSID*`
 
       # Check for config file && run if not present
       if !Dir.exists?("/usr/share/WHITECAT")
@@ -248,7 +312,7 @@ def main()
       🤍.cat
       🤍.banner
       🤍.monset
-      🤍.dump_PMKID
+      🤍.findBSSID
     ensure
       #startup_banner()
       puts "\n\t\tHashcat the cat with the hash....cat".colorize.red
