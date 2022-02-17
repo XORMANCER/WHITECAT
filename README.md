@@ -9,7 +9,7 @@ After installing [crystal](https://crystal-lang.org/install/), build main.cr and
 ```bash
 sudo crystal build --release main.cr -o whitecat
 sudo chmod +x setup.sh
-./setup.sh
+sudo ./setup.sh
 ```
 
 The compiled binary will be moved to `/usr/bin/whitecat`  
