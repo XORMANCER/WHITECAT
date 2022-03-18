@@ -4,8 +4,13 @@
 
 ## 📝 Installation
 
-After installing [crystal](https://crystal-lang.org/install/), build main.cr and run the setup file
+Install the [crystal](https://crystal-lang.org/install/) programming language.
 
+For kali linux (debian) users, the following command will install crystal.
+```bash
+curl -fsSL https://crystal-lang.org/install.sh | sudo bash
+```
+Next, run the following commands to build main.cr and execute the setup file.
 ```bash
 sudo crystal build --release main.cr -o whitecat
 sudo chmod +x setup.sh
