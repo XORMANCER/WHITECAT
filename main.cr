@@ -86,22 +86,6 @@ class Master
         puts ""
         puts "\t\t\t         -Version 2a-"
     end
-    def cat()
-      puts <<-'EOF'
-
-       ,-.       _,---._ __  / \
-      /  )    .-'       `./ /   \
-     (  (   ,'            `/    /|
-      \  `-"             \'\   / |
-       `.              ,  \ \ /  |
-        /`.          ,'-`----Y   |
-       (            ;        |   '
-       |  ,-.    ,-'         |  /
-       |  | (   |            | /
-       )  |  \  `.___________|/
-       `--'   `--'                          
-     EOF
-    end
     # Locates our BSSID
     def findBSSID()
       #Creates the first capture as a child
@@ -111,7 +95,7 @@ class Master
         iface = @json_object["wifi_card"].to_s
         bssid = @json_object["bssid"]
         #Starts the airodump process
-        puts `sudo airodump-ng -w findBSSID --band abg --bssid #{bssid} --output-format csv #{iface}`
+        `sudo airodump-ng -w findBSSID --band abg --bssid #{bssid} --output-format csv #{iface}`
         Signal::INT.trap() do
           puts "Signal caught. Exiting cleanly."
           exit()
@@ -157,7 +141,7 @@ class Master
           end
           child_pid.signal(Signal::KILL)
           scanning = false
-	  `sudo pkill airodump`
+	  `sudo pkill airodump-ng`
 	  sleep 1 
         end
       end
@@ -207,10 +191,9 @@ class Master
         `echo #{bssid.upcase} > bssidFilter`
         #Starts the airodump process
         `touch tmpTracker` 
-        puts `sudo hcxdumptool -i #{iface} -o dump_PMKID.pcapng --enable_status=1 --filterlist_ap=bssidFilter --filtermode=2 --error_max=5 --disable_deauthentication -c #{channel_num} >> tmpTracker`
+        `sudo hcxdumptool -i #{iface} -o dump_PMKID.pcapng --enable_status=1 --filterlist_ap=bssidFilter --error_max=5 --disable_deauthentication >> tmpTracker`
         Signal::INT.trap() do
-          puts ""
-          #exit()
+          exit()
         end
         loop do end
       end
@@ -222,8 +205,6 @@ class Master
           forever = false
         end
       end
-      # Prints cat banner
-      cat()
       #This will scan the .csv file for our target bssid
       scanning = true
       dotCounter = 0
@@ -234,9 +215,7 @@ class Master
           dotCounter +=1
         else
           if dotCounter > 5
-            system "clear"
-            cat()
-            print "\n[!] ".colorize.light_green, "Waiting for PMKID"
+            print "\r[!] ".colorize.light_green, "Waiting for PMKID"
             dotCounter = 0
           end
           print "."
@@ -257,10 +236,24 @@ class Master
           scanning = false
         end
       end
-      # Prep pcap for hascat
-      puts "\n>> Converting .pcapng to 16800 hashcat format".colorize.light_magenta
-      puts `sudo hcxpcaptool -z pmkid.16800 dump_PMKID.pcapng`
-      print "[!]".colorize.light_red, " PMKID Converted!, run ", "sudo hashcat -m 16800 pmkid.16800 [wordlist] --show".colorize.light_yellow, "\n"
+      # Prep pcap for hashcat
+      puts "\r>> Converting .pcapng to 22000 hashcat format".colorize.light_magenta, ""
+      puts `sudo hcxpcapngtool -o pmkid.22000 dump_PMKID.pcapng`
+      print "\r"
+      puts <<-'EOF'
+					       ,-.       _,---._ __  / \
+					      /  )    .-'       `./ /   \
+					     (  (   ,'            `/    /|
+					      \  `-'             \'\   / |
+					       `.              ,  \ \ /  |
+						       /`.          ,'-`----Y   |
+					       (            ;        |   '
+					       |  ,-.    ,-'         |  /
+					       |  | (   |   WHITECAT | /
+					       )  |  \  `.___________|/
+					       `--'   `--'
+      EOF
+      print "\n[!]".colorize.light_red, " PMKID Converted!, run ", "sudo hashcat -m 22000 pmkid.22000 [wordlist] ".colorize.light_yellow, "\n"
     end
 # End of class
 end
@@ -278,7 +271,7 @@ def main()
       # Cleanup old survey(s)
       `sudo rm -rf bssidFilter*`
       `sudo rm -rf dump_PMKID*`
-      `sudo rm -rf pmkid.16800*`
+      `sudo rm -rf pmkid.22000*`
       `sudo rm -rf tmpTracker*`
       `sudo rm -rf findBSSID*`
 
@@ -309,7 +302,6 @@ def main()
         exit()
       end
       # Do stuff
-      🤍.cat
       🤍.banner
       🤍.monset
       🤍.findBSSID
