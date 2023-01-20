@@ -162,7 +162,7 @@ class Master
       # Begin our process
       `sudo airmon-ng check kill >/dev/null`
       `sudo ip link set #{iface} down`
-      `sudo iw dev #{iface} set mode monitor`
+      `sudo iw dev #{iface} set type monitor`
       `sudo ip link set #{iface} up`
       #`sudo hcxdumptool -m #{iface}`
       puts "", `sudo iwconfig #{iface}`
