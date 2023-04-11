@@ -265,6 +265,7 @@ def main()
       if rootCheck != "root"
         puts ""
         STDERR.print "Run this as root, dingus (≖︿≖✿)".colorize.red
+	print "\n"
         exit()
       end
 
