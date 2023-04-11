@@ -191,7 +191,7 @@ class Master
         `echo #{bssid.upcase} > bssidFilter`
         #Starts the airodump process
         `touch tmpTracker` 
-        `sudo hcxdumptool -i #{iface} -o dump_PMKID.pcapng --active_beacon --enable_status=15 --filterlist_ap=bssidFilter --filtermode=2 >> tmpTracker`
+        `sudo hcxdumptool -i #{iface} -o dump_PMKID.pcapng --enable_status=15 --filterlist_ap=bssidFilter --filtermode=2 >> tmpTracker`
         Signal::INT.trap() do
           exit()
         end
