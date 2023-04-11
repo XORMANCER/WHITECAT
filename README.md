@@ -26,7 +26,7 @@ All configuration files are located within `/usr/share/WHITECAT`
 sudo whitecat
 ```
 
-If the target AP supports PMKID authentication, attempting to connect to the access point with an improper password will force a PMKID frame to populate. This can theoretically allow clientless WPA2 authentication bypass.
+If a target AP supports PMKID authentication, attempting to connect with an improper password will force a PMKID frame to populate. This can theoretically allow clientless WPA2 authentication, as only an attempted connection is required.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
